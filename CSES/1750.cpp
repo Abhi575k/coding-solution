@@ -4,19 +4,8 @@ using namespace std;
 
 void solve();
 
-int findLoopLen(int s,vector<int> &a,vector<int> &loop_len, vector<bool> &vis,int val){
-    if(vis[s]){
-        loop_len[s]=val;
-        
-    }else{
-        vis[s]=true;
-        loop_len[s]=findLoopLen(a[s],a,loop_len,vis,val+1);
-    }
-    return loop_len[s];
-}
-
 vector<int> planetQueries1(int n,int q,vector<int> &a,vector<vector<int>> &queries){
-    int MX=36;
+    int MX=31;
     vector<vector<int>> dist_table(n+1,vector<int>(MX+1,-1));
     for(int i=1;i<=n;i++){
         dist_table[i][0]=a[i];
@@ -27,19 +16,15 @@ vector<int> planetQueries1(int n,int q,vector<int> &a,vector<vector<int>> &queri
             dist_table[j][i]=dist_table[q_next][i-1];
         }
     }
-    vector<int> loop_len(n+1,n);
     vector<bool> vis(n+1,false);
-    for(int i=1;i<=n;i++){
-        if(!vis[i]) findLoopLen(i,a,loop_len,vis,0);
-    }
     vector<int> res;
     for(int i=0;i<q;i++){
         int x=queries[i][0];
-        int k=queries[i][1]%loop_len[x];
-        while(k>0){
-            int max_step=min(MX,(int)(log2(k)));
-            x=dist_table[x][max_step];
-            k-=(1<<max_step);
+        int k=queries[i][1];
+        for(int j=0;j<=MX;j++){
+            if((k&(1<<j))!=0){
+                x=dist_table[x][j];
+            }
         }
         res.push_back(x);
     }
